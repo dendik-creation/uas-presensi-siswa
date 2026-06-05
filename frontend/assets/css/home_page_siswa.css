@@ -1,0 +1,144 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background-color: #f4f7fb;
+    color: #333;
+}
+
+/* Header */
+.header {
+    background-color: #1e88e5;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    font-size: 24px;
+}
+
+.user-info {
+    text-align: right;
+    font-size: 14px;
+}
+
+/* Container */
+.container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 15px;
+}
+
+/* Card */
+.card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.card h2 {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+/* Status */
+.status {
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.status.belum {
+    color: #e53935;
+}
+
+.status.sudah {
+    color: #43a047;
+}
+
+.time-info p {
+    font-size: 14px;
+}
+
+/* Buttons */
+.btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn.masuk {
+    background-color: #1e88e5;
+    color: white;
+}
+
+.btn.pulang {
+    background-color: #43a047;
+    color: white;
+}
+
+.btn.simpan {
+    background-color: #5e35b1;
+    color: white;
+}
+
+.btn:disabled {
+    background-color: #bdbdbd;
+    cursor: not-allowed;
+}
+
+.info-text {
+    font-size: 12px;
+    color: #777;
+    margin-top: 8px;
+    text-align: center;
+}
+
+/* Location */
+.inside {
+    color: #43a047;
+    font-weight: bold;
+}
+
+.outside {
+    color: #e53935;
+    font-weight: bold;
+}
+
+/* Journal */
+textarea {
+    width: 100%;
+    height: 120px;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    resize: none;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 15px;
+    font-size: 13px;
+    color: #777;
+}
+
+.date-time {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-top: 4px;
+    display: block;
+}
