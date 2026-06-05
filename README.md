@@ -208,7 +208,7 @@ Berikut langkah menjalankan proyek dari hasil clone repository.
 ### 1. Clone Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/dendik-creation/uas-presensi-siswa
 ```
 
 Masuk ke direktori proyek dan masuk ke backend:
@@ -229,7 +229,7 @@ npm install
 
 Buat database MySQL sesuai kebutuhan proyek, kemudian sesuaikan konfigurasi koneksi database pada backend.
 
-Lakukan copy file .env.example ke .env dan sesuaikan nilai tiap variablenya :
+Lakukan copy file .env.example ke .env dan sesuaikan nilai tiap variablenya. Pastikan kamu sudah membuat database mysql nya dahulu
 
 ```bash
 cp .env.example .env
