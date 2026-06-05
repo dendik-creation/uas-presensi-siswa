@@ -256,7 +256,3 @@ Buka file yang ada di folder frontend/index.html di browser
 ## Catatan Pengembangan
 
 EPresensi dikembangkan sebagai proyek **Ujian Akhir Semester (UAS) Mata Kuliah Praktikum Web** dengan fokus implementasi teknologi web berbasis frontend, backend, database, dan integrasi validasi lokasi menggunakan GPS.
-
-```
-
-```
