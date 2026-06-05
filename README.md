@@ -186,7 +186,7 @@ Informasi yang disimpan:
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | Dendi' Setiawan           | Sistem login dan autentikasi, validasi jarak presensi menggunakan rumus Haversine, antarmuka Login, dan Dasbor Siswa.          |
 | Naufal Rizqi Ilham Gibran | Pengelolaan pengaturan global, ekspor laporan ke Excel dan PDF, antarmuka Pengaturan, dan antarmuka Laporan pada Dasbor Admin. |
-| Alvina Salsabila          | Fitur CRUD data siswa dan antarmuka Manajemen Siswa pada Dasbor Admin.                                                         |
+| Alvina Salsabilla          | Fitur CRUD data siswa dan antarmuka Manajemen Siswa pada Dasbor Admin.                                                         |
 | Labibah Rohmah            | Fitur profil pengguna, perubahan kata sandi, histori presensi siswa, serta antarmuka Profil dan Histori Presensi.              |
 
 ## Struktur Sistem
