@@ -1,4 +1,3 @@
-````md
 # EPresensi
 
 EPresensi merupakan proyek tugas akhir (UAS) mata kuliah Praktikum Web yang bertujuan untuk melakukan digitalisasi sistem presensi siswa di lingkungan sekolah. Sistem ini dirancang untuk menggantikan proses presensi konvensional dengan validasi lokasi berbasis GPS serta pengisian jurnal kegiatan harian.
@@ -201,7 +200,6 @@ Backend API (Express JS)
         ↓ mysql2
 Database (MySQL)
 ```
-````
 
 ## Instalasi
 
