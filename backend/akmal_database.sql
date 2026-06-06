@@ -4,7 +4,7 @@ CREATE TABLE `users` (
   `username` varchar(255) UNIQUE NOT NULL,
   `password` varchar(255) NOT NULL,
   `nomor_induk` varchar(255) UNIQUE,
-  `role` enum(admin,siswa) NOT NULL,
+  `role` enum('admin','siswa') NOT NULL,
   `kelas` varchar(255) COMMENT 'nullable, hanya untuk siswa',
   `no_hp` varchar(255),
   `profil_foto` varchar(255),
@@ -31,7 +31,7 @@ CREATE TABLE `system_settings` (
 CREATE TABLE `presensi` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `siswa_id` int NOT NULL,
-  `jenis_presensi` enum(hadir,izin,sakit,alpa) NOT NULL,
+  `jenis_presensi` enum('hadir','izin','sakit','alpa') NOT NULL,
   `waktu_masuk` timestamp,
   `waktu_pulang` timestamp,
   `latitude_masuk` decimal(10,8),
