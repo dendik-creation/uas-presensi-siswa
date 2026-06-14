@@ -1,0 +1,84 @@
+<%- include('partials/header') %>
+<!-- SweetAlert2 for elegant alerts -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="row justify-content-center align-items-center my-5 flex-grow-1">
+  <div class="col-md-5">
+    <div class="card shadow border-0 p-4">
+      <div class="card-body">
+        <div class="text-center mb-4">
+          <span class="fa-stack fa-2x text-primary mb-2">
+            <i class="fa-solid fa-circle fa-stack-2x text-primary-emphasis opacity-10"></i>
+            <i class="fa-solid fa-graduation-cap fa-stack-1x"></i>
+          </span>
+          <h3 class="fw-bold text-dark">EPresensi</h3>
+          <p class="text-muted small">Sistem Presensi Siswa & Jurnal Harian</p>
+        </div>
+
+        <form id="loginForm">
+          <div class="mb-3">
+            <label for="username" class="form-label text-secondary small fw-semibold">Username</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-user"></i></span>
+              <input type="text" class="form-control border-start-0" id="username" placeholder="Masukkan Username Anda" required>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="password" class="form-label text-secondary small fw-semibold">Password</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-lock"></i></span>
+              <input type="password" class="form-control border-start-0" id="password" placeholder="Masukkan Password Anda" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold shadow-sm">
+            <i class="fa-solid fa-right-to-bracket me-2"></i>Masuk
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    try {
+      const response = await fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Login Berhasil',
+          text: 'Tunggu bentar wak..',
+          timer: 600,
+          showConfirmButton: false
+        }).then(() => {
+          window.location.href = '/';
+        });
+      } else {
+        throw new Error(result.message || 'Login gagal!');
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Gagal',
+        text: error.message
+      });
+    }
+  });
+</script>
+<%- include('partials/footer') %>

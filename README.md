@@ -1,6 +1,6 @@
 # EPresensi
 
-EPresensi merupakan proyek tugas akhir (UAS) mata kuliah Praktikum Web yang bertujuan untuk melakukan digitalisasi sistem presensi siswa di lingkungan sekolah. Sistem ini dirancang untuk menggantikan proses presensi konvensional dengan validasi lokasi berbasis GPS serta pengisian jurnal kegiatan harian.
+EPresensi merupakan proyek tugas akhir (UAS) mata kuliah Praktikum Web yang bertujuan untuk melakukan digitalisasi sistem presensi siswa di lingkungan sekolah. Sistem ini menggunakan arsitektur monolitik Server-Side Rendering (SSR) berbasis Express.js dengan template engine EJS dan penyimpanan basis data MySQL.
 
 ## Daftar Isi
 
@@ -8,12 +8,11 @@ EPresensi merupakan proyek tugas akhir (UAS) mata kuliah Praktikum Web yang bert
 2. [Tujuan Proyek](#tujuan-proyek)
 3. [Teknologi yang Digunakan](#teknologi-yang-digunakan)
 4. [Fitur Utama](#fitur-utama)
-5. [Alur Presensi](#alur-presensi)
-6. [Skema Database](#skema-database)
-7. [Pembagian Tugas Tim](#pembagian-tugas-tim)
-8. [Struktur Sistem](#struktur-sistem)
-9. [Instalasi](#instalasi)
-10. [Catatan Pengembangan](#catatan-pengembangan)
+5. [Skema Database](#skema-database)
+6. [Struktur Sistem](#struktur-sistem)
+7. [Daftar Tugas Tim (Task List)](#daftar-tugas-tim-task-list)
+8. [Instalasi](#instalasi)
+9. [Akun Pengujian Awal](#akun-pengujian-awal)
 
 ---
 
@@ -21,238 +20,180 @@ EPresensi merupakan proyek tugas akhir (UAS) mata kuliah Praktikum Web yang bert
 
 Presensi siswa pada lingkungan sekolah umumnya masih dilakukan secara konvensional, baik menggunakan pencatatan manual maupun verifikasi sederhana yang rentan terhadap manipulasi data kehadiran. Oleh karena itu, proyek **EPresensi** dikembangkan sebagai bentuk implementasi digitalisasi presensi siswa dengan memanfaatkan validasi lokasi berbasis GPS untuk meningkatkan keakuratan data kehadiran.
 
-Selain pencatatan kehadiran, sistem ini juga menyediakan fitur jurnal harian sebagai dokumentasi aktivitas siswa setelah kegiatan belajar berlangsung.
+Selain pencatatan kehadiran, sistem ini juga menyediakan fitur jurnal harian sebagai dokumentasi aktivitas siswa setelah kegiatan belajar berlangsung sebelum diperbolehkan melakukan presensi pulang.
 
 ## Tujuan Proyek
 
 Tujuan dari pengembangan sistem EPresensi adalah:
 
-- Mengimplementasikan sistem presensi siswa berbasis web.
-- Memanfaatkan validasi lokasi menggunakan GPS untuk proses kehadiran.
-- Mendokumentasikan aktivitas siswa melalui jurnal harian.
-- Menerapkan konsep pengembangan aplikasi web menggunakan arsitektur frontend, backend, dan database pada tugas akhir mata kuliah Praktikum Web.
+- Mengimplementasikan sistem presensi siswa berbasis web yang terintegrasi.
+- Memanfaatkan validasi lokasi menggunakan GPS (rumus Haversine) untuk proses kehadiran.
+- Mendokumentasikan aktivitas harian siswa melalui pengisian jurnal harian saat pulang.
+- Menerapkan arsitektur monolitik Server-Side Rendering (SSR) menggunakan Express.js, EJS, dan MySQL pada tugas akhir mata kuliah Praktikum Web.
 
 ## Teknologi yang Digunakan
 
-### Backend
+### Core & Server (Monolith SSR)
 
-- Node.js
-- Express JS
-- MySQL Driver (`mysql2`)
+- **Node.js**: Lingkungan runtime JavaScript.
+- **Express.js**: Framework web backend.
+- **Express Session (`express-session`)**: Penyimpanan session berbasis cookie di sisi server untuk login/logout pengguna.
+- **EJS (Embedded JavaScript)**: Template engine untuk merender halaman HTML dinamis.
+- **MySQL Driver (`mysql2`)**: Penghubung aplikasi dengan basis data MySQL.
 
-### Frontend
+### Antarmuka & Frontend
 
-- HTML
-- CSS
-- JavaScript (Vanilla JS)
-- Bootstrap
-- SweetAlert2 (PopUp feedback)
-- Fetch API
+- **Bootstrap 5 CDN (Light Mode)**: Library CSS & JS untuk tampilan responsif, bersih, dan modern.
+- **FontAwesome CDN**: Library ikon grafis berkualitas.
+- **SweetAlert2 CDN**: Library popup interaktif untuk memberikan feedback aksi pengguna.
+- **HTML5 Geolocation API**: Mengambil koordinat GPS siswa secara realtime via browser.
+- **Leaflet.js CDN**: Peta interaktif untuk mapping koordinat lokasi sekolah oleh admin.
 
-### Database
+### Basis Data
 
-- MySQL
+- **MySQL**: Penyimpanan data terstruktur (siswa, presensi, pengaturan).
+
+---
 
 ## Fitur Utama
 
 Sistem EPresensi memiliki beberapa fitur utama sebagai berikut:
 
-### 1. Sistem Login dan Autentikasi
+### 1. Autentikasi Pengguna & Cookie Session
+Sistem masuk (login) menggunakan form HTML terintegrasi. Sesi login dikelola di server menggunakan `express-session`. Dilengkapi dengan proteksi rute halaman menggunakan middleware `authOnly` dan otorisasi peranan (role-check) menggunakan `roleOnly(role)`.
 
-Pengguna dapat masuk ke sistem menggunakan akun yang telah terdaftar berdasarkan hak akses masing-masing.
+### 2. Presensi Berbasis GPS (Haversine Formula)
+Sistem melakukan validasi lokasi siswa saat melakukan presensi masuk dan pulang berdasarkan koordinat lintang (*latitude*) dan bujur (*longitude*) sekolah dengan batas radius toleransi (meter) tertentu.
 
-Hak akses yang tersedia:
+### 3. Presensi Hadir Masuk & Pulang
+Siswa wajib mengaktifkan GPS dan berada di dalam radius sekolah sebelum dapat mengirim presensi. Untuk presensi pulang, siswa juga diwajibkan menulis jurnal kegiatan harian.
 
-- Admin
-- Siswa
+### 4. Presensi Sakit dan Izin
+Status sakit dan izin tidak memerlukan akses lokasi GPS. Siswa hanya perlu mengunggah keterangan alasan sakit/izin dan status kehadirannya langsung tercatat untuk satu hari penuh.
 
-### 2. Presensi Berbasis GPS
+### 5. Manajemen Siswa (CRUD Admin)
+Admin dapat mengelola data siswa: Menambah siswa, menampilkan daftar, mengedit detail (termasuk mengganti password), dan menghapus data siswa beserta log kehadirannya.
 
-Sistem melakukan validasi lokasi pengguna berdasarkan koordinat sekolah dan batas radius yang ditentukan.
+### 6. Pengaturan Sistem Global (Admin)
+Admin dapat mengonfigurasi parameter operasional sekolah (batas radius GPS, waktu mulai/selesai presensi masuk & pulang, dan koordinat latitude/longitude sekolah) secara interaktif menggunakan peta Leaflet.js (geser pin/klik lokasi).
 
-### 3. Presensi Hadir Masuk
+### 7. Laporan & Rekapitulasi Presensi (Admin)
+Admin dapat melihat rekapitulasi data presensi siswa, memfilternya, serta mengekspornya ke format Excel (CSV) dan cetak PDF.
 
-Siswa wajib mengaktifkan GPS untuk melakukan validasi lokasi sebelum presensi berhasil direkam.
-
-### 4. Presensi Hadir Pulang
-
-Siswa wajib:
-
-- Mengaktifkan GPS.
-- Berada pada radius lokasi sekolah.
-- Mengisi jurnal kegiatan harian.
-
-### 5. Presensi Sakit dan Izin
-
-Status **Sakit** dan **Izin** tidak memerlukan validasi GPS dan akan langsung tercatat untuk satu hari penuh.
-
-### 6. Pengelolaan Data Siswa
-
-Admin dapat melakukan pengelolaan data siswa melalui fitur CRUD:
-
-- Menambah data siswa
-- Menampilkan data siswa
-- Memperbarui data siswa
-- Menghapus data siswa
-
-### 7. Pengaturan Sistem
-
-Admin dapat mengelola konfigurasi global sistem, meliputi:
-
-- Radius validasi presensi
-- Koordinat sekolah
-- Jam operasional presensi
-
-### 8. Laporan Presensi
-
-Admin dapat melakukan rekapitulasi data presensi dan mengekspor laporan ke:
-
-- Excel
-- PDF
-
-### 9. Profil Pengguna
-
-Pengguna dapat:
-
-- Melihat profil
-- Memperbarui informasi profil
-- Mengubah kata sandi
-
-### 10. Riwayat Presensi
-
-Siswa dapat melihat histori presensi pribadi yang telah dilakukan.
-
-## Alur Presensi
-
-### Presensi Hadir Masuk
-
-1. Siswa login ke sistem.
-2. Sistem meminta akses lokasi (GPS).
-3. Lokasi siswa divalidasi menggunakan koordinat sekolah.
-4. Sistem menghitung jarak menggunakan rumus Haversine.
-5. Jika siswa berada dalam radius yang diizinkan, presensi masuk berhasil direkam.
-
-### Presensi Hadir Pulang
-
-1. Siswa melakukan validasi lokasi GPS.
-2. Siswa mengisi jurnal kegiatan harian.
-3. Sistem menyimpan data jam pulang beserta jurnal kegiatan.
-
-### Presensi Sakit atau Izin
-
-1. Siswa memilih status kehadiran.
-2. Data langsung tercatat tanpa validasi lokasi GPS.
-3. Status berlaku untuk satu hari penuh.
+---
 
 ## Skema Database
 
-Sistem menggunakan tiga tabel utama:
+Sistem EPresensi menggunakan tiga tabel utama:
 
-### 1. `users`
+1. **`users`**: Menyimpan kredensial pengguna, nama lengkap, kelas (khusus siswa), No. HP, peran (*role* admin/siswa), dan status keaktifan akun.
+2. **`presensi`**: Log kehadiran harian siswa, memuat jam masuk, jam pulang, koordinat lokasi masuk/pulang, jarak dari sekolah, jurnal, status GPS, serta alasan izin.
+3. **`pengaturan`**: Menyimpan konfigurasi operasional global sekolah (jam mulai/selesai presensi masuk & pulang, radius GPS, dan koordinat latitude/longitude sekolah).
 
-Menyimpan data kredensial pengguna untuk proses autentikasi dan hak akses sistem.
-
-Fungsi:
-
-- Login pengguna
-- Penyimpanan role Admin dan Siswa
-
-### 2. `presensi`
-
-Menyimpan data log presensi harian siswa.
-
-Informasi yang disimpan:
-
-- Jam masuk
-- Jam pulang
-- Koordinat lokasi
-- Status kehadiran
-- Jurnal kegiatan harian
-
-### 3. `settings`
-
-Menyimpan konfigurasi global sistem.
-
-Informasi yang disimpan:
-
-- Jam operasional presensi
-- Radius validasi lokasi
-- Koordinat lintang sekolah
-- Koordinat bujur sekolah
-
-## Pembagian Tugas Tim
-
-| Penanggung Jawab          | Tugas                                                                                                                          |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Dendi' Setiawan           | Sistem login dan autentikasi, validasi jarak presensi menggunakan rumus Haversine, antarmuka Login, dan Dasbor Siswa.          |
-| Naufal Rizqi Ilham Gibran | Pengelolaan pengaturan global, ekspor laporan ke Excel dan PDF, antarmuka Pengaturan, dan antarmuka Laporan pada Dasbor Admin. |
-| Alvina Salsabilla          | Fitur CRUD data siswa dan antarmuka Manajemen Siswa pada Dasbor Admin.                                                         |
-| Labibah Rohmah            | Fitur profil pengguna, perubahan kata sandi, histori presensi siswa, serta antarmuka Profil dan Histori Presensi.              |
+---
 
 ## Struktur Sistem
 
-Arsitektur sistem terdiri atas:
+Sistem ini dikembangkan secara monolitik menggunakan arsitektur folder tunggal (tanpa pemisahan direktori frontend dan backend):
 
 ```text
-Frontend (HTML, CSS, JS)
-        ↓ Fetch API
-Backend API (Express JS)
-        ↓ mysql2
-Database (MySQL)
+uas-presensi-siswa/
+├── config/             # Konfigurasi koneksi MySQL pool
+├── controllers/        # Logika bisnis EJS Views & API Endpoints
+├── middleware/         # Autentikasi Cookie Session & validasi role
+├── model/              # Abstraksi query database (User, Presensi, Pengaturan)
+├── views/              # Berkas template EJS (HTML dinamis)
+│   ├── admin/          # Tampilan khusus Admin
+│   ├── siswa/          # Tampilan khusus Siswa
+│   └── partials/       # Komponen global header & footer
+├── .env                # Variabel lingkungan (port, database)
+├── app.js              # Entry point utama Express server
+├── database.sql        # Struktur & data awal basis data MySQL
+├── package.json        # Manajer dependensi npm
+└── README.md           # Dokumentasi proyek
 ```
+
+---
+
+## Daftar Tugas Tim (Task List)
+
+Berikut adalah detail pembagian tugas tim dari Notion yang telah disesuaikan dengan arsitektur monolitik baru:
+- [x] Tugas yang sudah selesai
+- [ ] Tugas yang masih dalam proses pengerjaan
+
+### **Dendi' Setiawan**
+- [x] Rancang Schema Database
+- [x] Fitur Autentikasi: Rancang middleware session (`authOnly`), logic login/logout controller, & enkripsi multi-hash
+- [ ] Fitur Presensi: Logic controller, model, & rute API presensi masuk & pulang berbasis validasi GPS
+- [ ] Fitur Presensi Izin: Logic pengajuan izin/sakit tanpa GPS
+
+### **Naufal Rizqi Ilham Gibran**
+- [x] Rancang Schema Database & Membuat Flowchart
+- [x] Desain UI Login: Rancang halaman masuk web (`login.ejs`) light mode
+- [x] Fitur Pengaturan Global: Query model & API controller pengaturan sekolah
+- [ ] Fitur Laporan: Log rekapitulasi, cetak PDF, ekspor CSV, & filter data presensi
+- [ ] Desain UI Dashboard Siswa: Tampilan antarmuka gawai & pendeteksi jarak GPS
+
+### **Alvina Salsabilla (Salsa)**
+- [x] Design UI Dashboard Admin & Pengaturan: View pengaturan EJS & integrasi Leaflet map UMK
+- [ ] Fitur Manajemen Siswa: Controller & Model API CRUD siswa
+- [ ] Design UI Manajemen Siswa: Halaman tabel siswa, form tambah, dan form ubah EJS
+
+### **Labibah Rohmah**
+- [x] Fitur Update Profil Diri: Logic model & API update nama dan kontak No. HP
+- [x] Design UI Halaman Profil Diri: Halaman form ubah data profil & reset kata sandi EJS
+- [ ] Design Histori Presensi Siswa: Tabel log riwayat kehadiran individu di dashboard siswa
+
+---
 
 ## Instalasi
 
-Berikut langkah menjalankan proyek dari hasil clone repository.
+Ikuti langkah-langkah di bawah ini untuk memasang dan menjalankan proyek di komputer lokal Anda.
 
 ### 1. Clone Repository
 
 ```bash
 git clone https://github.com/dendik-creation/uas-presensi-siswa
+cd uas-presensi-siswa
 ```
 
-Masuk ke direktori proyek dan masuk ke backend:
-
-```bash
-cd uas-presensi-siswa/backend
-```
-
-### 2. Install Dependency
-
-Pastikan Node.js telah terpasang, kemudian jalankan:
+### 2. Pasang Dependency
 
 ```bash
 npm install
 ```
 
-### 3. Konfigurasi Database
+### 3. Konfigurasi Basis Data (MySQL)
 
-Buat database MySQL sesuai kebutuhan proyek, kemudian sesuaikan konfigurasi koneksi database pada backend.
+1. Buat database baru bernama `e_presensi`.
+2. Impor struktur tabel dari database.sql ke database Anda.
+3. Salin berkas `.env.example` menjadi `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+4. Sesuaikan variabel konfigurasi koneksi database Anda di dalam berkas `.env`.
 
-Lakukan copy file .env.example ke .env dan sesuaikan nilai tiap variablenya. Pastikan kamu sudah membuat database mysql nya dahulu
-
-```bash
-cp .env.example .env
-```
-
-### 4. Jalankan Server
-
-Jalankan aplikasi menggunakan:
+### 4. Jalankan Aplikasi
 
 ```bash
 npm run dev
 ```
 
-atau
+Aplikasi dapat diakses melalui browser pada alamat:
+[http://localhost:3000](http://localhost:3000)
 
-```bash
-node app.js
-```
+---
 
-### 5. Akses Aplikasi
+## Akun Pengujian Awal
 
-Buka file yang ada di folder frontend/index.html di browser
+Gunakan akun berikut untuk menguji login pada portal EPresensi:
 
-## Catatan Pengembangan
-
-EPresensi dikembangkan sebagai proyek **Ujian Akhir Semester (UAS) Mata Kuliah Praktikum Web** dengan fokus implementasi teknologi web berbasis frontend, backend, database, dan integrasi validasi lokasi menggunakan GPS.
+- **Admin**:
+  - **Username**: `admin`
+  - **Password**: `12345`
+- **Siswa 1**:
+  - **Username**: `siswa1`
+  - **Password**: `12345`
+- **Siswa 2**:
+  - **Username**: `siswa2`
+  - **Password**: `12345`

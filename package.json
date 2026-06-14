@@ -1,0 +1,35 @@
+{
+  "name": "uas-presensi-siswa",
+  "version": "1.0.0",
+  "description": "Sistem Presensi Siswa berbasis GPS dan Jurnal Harian",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "start": "node app.js"
+  },
+  "keywords": [
+    "presensi",
+    "siswa",
+    "gps",
+    "jurnal",
+    "harian",
+    "nodejs",
+    "express",
+    "mysql"
+  ],
+  "author": "Dendi' Setiawan; Naufal Rizqi Ilham Gibran; Labibah Rohmah; Alvina Salsabila",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "ejs": "^3.1.10",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "mysql2": "^3.22.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

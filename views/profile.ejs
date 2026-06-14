@@ -1,0 +1,148 @@
+<%- include('partials/header') %>
+<!-- SweetAlert2 for notifications -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="row justify-content-center my-4">
+  <div class="col-md-8">
+    <div class="card shadow-sm border-0 p-4 bg-white text-dark">
+      <div class="card-header border-0 bg-transparent pb-3 d-flex justify-content-between align-items-center">
+        <h4 class="mb-0 fw-bold text-primary"><i class="fa-solid fa-id-card me-2"></i>Profil Saya</h4>
+        <span class="badge bg-secondary text-capitalize py-2 px-3 fs-6"><%= user.role %></span>
+      </div>
+      
+      <div class="card-body">
+        <!-- Display Info Table -->
+        <div class="row mb-4">
+          <div class="col-md-3 text-center mb-3">
+            <span class="fa-stack fa-4x text-muted opacity-75">
+              <i class="fa-solid fa-circle fa-stack-2x text-light-emphasis"></i>
+              <i class="fa-solid fa-user fa-stack-1x text-secondary"></i>
+            </span>
+          </div>
+          <div class="col-md-9">
+            <table class="table table-borderless text-dark align-middle">
+              <tbody>
+                <tr>
+                  <td class="text-secondary small fw-semibold" style="width: 30%;">Nama Lengkap</td>
+                  <td>: <strong><%= user.nama %></strong></td>
+                </tr>
+                <tr>
+                  <td class="text-secondary small fw-semibold">Username</td>
+                  <td>: <code><%= user.username %></code></td>
+                </tr>
+                <% if (user.role === 'siswa') { %>
+                  <tr>
+                    <td class="text-secondary small fw-semibold">Nomor Induk Siswa</td>
+                    <td>: <%= user.nomor_induk || '-' %></td>
+                  </tr>
+                  <tr>
+                    <td class="text-secondary small fw-semibold">Kelas</td>
+                    <td>: <%= user.kelas || '-' %></td>
+                  </tr>
+                <% } %>
+                <tr>
+                  <td class="text-secondary small fw-semibold">No. HP</td>
+                  <td>: <%= user.no_hp || '-' %></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Form Edit Profile -->
+        <h5 class="fw-bold mb-3 text-primary"><i class="fa-solid fa-user-pen me-2"></i>Perbarui Kontak & Kata Sandi</h5>
+        <form id="profileForm">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="nama" class="form-label text-secondary small fw-semibold">Nama Lengkap <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="nama" name="nama" value="<%= user.nama %>" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="no_hp" class="form-label text-secondary small fw-semibold">No. HP</label>
+              <input type="text" class="form-control" id="no_hp" name="no_hp" value="<%= user.no_hp || '' %>">
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="password" class="form-label text-secondary small fw-semibold">Kata Sandi Baru (Kosongkan jika tidak diubah)</label>
+              <input type="password" class="form-control" id="password" placeholder="Minimal 5 karakter">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="confirm_password" class="form-label text-secondary small fw-semibold">Konfirmasi Kata Sandi Baru</label>
+              <input type="password" class="form-control" id="confirm_password" placeholder="Ulangi kata sandi baru">
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-4">
+            <a href="/" class="btn btn-outline-secondary px-4"><i class="fa-solid fa-arrow-left me-2"></i>Kembali</a>
+            <button type="submit" class="btn btn-primary px-4"><i class="fa-solid fa-floppy-disk me-2"></i>Simpan Perubahan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('profileForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const nama = document.getElementById('nama').value;
+    const no_hp = document.getElementById('no_hp').value;
+    const password = document.getElementById('password').value;
+    const confirm_password = document.getElementById('confirm_password').value;
+
+    if (password) {
+      if (password.length < 5) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Validasi Gagal',
+          text: 'Kata sandi baru minimal 5 karakter!'
+        });
+        return;
+      }
+      if (password !== confirm_password) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Validasi Gagal',
+          text: 'Konfirmasi kata sandi baru tidak cocok!'
+        });
+        return;
+      }
+    }
+
+    try {
+      const response = await fetch('/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ nama, no_hp, password })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Berhasil',
+          text: 'Profil Anda berhasil diperbarui!'
+        }).then(() => {
+          window.location.reload();
+        });
+      } else {
+        throw new Error(result.message || 'Gagal menyimpan profil.');
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message
+      });
+    }
+  });
+</script>
+<%- include('partials/footer') %>
