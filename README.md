@@ -78,7 +78,7 @@ Admin dapat mengelola data siswa: Menambah siswa, menampilkan daftar, mengedit d
 Admin dapat mengonfigurasi parameter operasional sekolah (batas radius GPS, waktu mulai/selesai presensi masuk & pulang, dan koordinat latitude/longitude sekolah) secara interaktif menggunakan peta Leaflet.js (geser pin/klik lokasi).
 
 ### 7. Laporan & Rekapitulasi Presensi (Admin)
-Admin dapat melihat rekapitulasi data presensi siswa, memfilternya, serta mengekspornya ke format Excel (CSV) dan cetak PDF.
+Admin dapat melihat rekapitulasi data presensi siswa, memfilternya, serta mencetaknya ke format PDF.
 
 ---
 
@@ -133,7 +133,7 @@ Berikut adalah detail pembagian tugas tim dari Notion yang telah disesuaikan den
 - [x] Fitur Pengaturan Global: Query model & API controller pengaturan sekolah (`pengaturan` table)
 - [x] Design UI Dashboard Admin & Pengaturan: View pengaturan EJS & integrasi Leaflet map
 - [x] Desain UI Dashboard Siswa: Tampilan antarmuka gawai & pendeteksi jarak GPS
-- [ ] Fitur Rekap Presensi: Tabel riwayat absensi pada role admin, cetak PDF, ekspor CSV, & filter data presensi (Logic server dan ui frontend)
+- [ ] Fitur Rekap Presensi: Tabel riwayat absensi pada role admin, cetak PDF, & filter data presensi (Logic server dan ui frontend)
 
 ### **Alvina Salsabilla (Salsa)**
 - [ ] Fitur Manajemen Siswa: Controller & Model API CRUD siswa
