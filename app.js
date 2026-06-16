@@ -66,6 +66,7 @@ app.get("/profile", profileController.getProfilePage);
 app.post("/profile", profileController.updateProfile);
 
 // --- SISWA PORTAL API ---
+app.get("/presensi/tambah", roleOnly("siswa"), siswaDashboardController.getPresensiPage);
 app.post("/api/presensi/masuk", roleOnly("siswa"), siswaDashboardController.submitPresensiMasuk);
 app.post("/api/presensi/pulang", roleOnly("siswa"), siswaDashboardController.submitPresensiPulang);
 

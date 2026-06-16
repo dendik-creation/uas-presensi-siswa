@@ -1,0 +1,433 @@
+<%- include('../../partials/header') %>
+
+<!-- Leaflet CSS & JS via CDN -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<div class="container py-2" style="max-width: 600px;">
+  
+  <!-- Section Card 1: Map Preview -->
+  <div class="card border-0 shadow-sm bg-white overflow-hidden mb-3" style="border-radius: 12px;">
+    <div id="map" style="height: 240px; z-index: 1;"></div>
+  </div>
+
+  <!-- Section Card 2: GPS Status -->
+  <div class="card border-0 shadow-sm bg-white mb-3" style="border-radius: 12px;">
+    <div class="card-body py-3 px-4 d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center">
+        <i class="fa-solid fa-location-crosshairs text-primary me-2 fs-5"></i>
+        <div>
+          <div class="small fw-semibold text-dark">Status Lokasi</div>
+          <div class="text-secondary small" id="gps-distance-text">Mendeteksi jarak gawai Anda...</div>
+        </div>
+      </div>
+      <div>
+        <span id="gps-status-badge" class="badge bg-secondary py-2 px-3 text-white"><i class="fa-solid fa-spinner fa-spin me-1"></i> Memuat...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Card 3: Form Presensi -->
+  <div class="card border-0 shadow-sm bg-white mb-5" style="border-radius: 12px;">
+    <div class="card-body p-4">
+      <% if (!todayPresensi) { %>
+        <!-- Choice Buttons for Check-in Options -->
+        <div class="d-flex gap-2 mb-4 bg-light p-1 rounded-3">
+          <button type="button" id="btn-choice-hadir" class="btn btn-primary flex-fill py-2 fw-semibold" onclick="setChoice('hadir')">
+            Hadir (GPS)
+          </button>
+          <button type="button" id="btn-choice-izin" class="btn btn-outline-secondary flex-fill py-2 fw-semibold" onclick="setChoice('izin')">
+            Izin / Sakit
+          </button>
+        </div>
+
+        <!-- Form Masuk (Hadir) -->
+        <form id="formPresensiMasukHadir">
+          <input type="hidden" name="jenisPresensi" value="hadir">
+          <input type="hidden" name="latitude" class="user-lat">
+          <input type="hidden" name="longitude" class="user-lng">
+
+          <div class="text-center py-2">
+            <button type="submit" id="btn-submit-masuk-hadir" class="btn btn-success btn-lg w-100 py-3 fw-bold rounded-3" disabled>
+              KIRIM PRESENSI MASUK
+            </button>
+            <div class="mt-2 text-danger small fw-semibold" id="btn-masuk-warning">
+              Menunggu koordinat GPS yang valid di dalam radius sekolah...
+            </div>
+          </div>
+        </form>
+
+        <!-- Form Masuk (Izin/Sakit) -->
+        <form id="formPresensiMasukIzin" class="d-none">
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-secondary text-uppercase">Kategori Pengajuan</label>
+            <div class="d-flex gap-2">
+              <input type="radio" class="btn-check" name="jenisPresensi" id="option-izin" value="izin" checked autocomplete="off">
+              <label class="btn btn-outline-info flex-fill py-2 fw-semibold" for="option-izin">Izin</label>
+
+              <input type="radio" class="btn-check" name="jenisPresensi" id="option-sakit" value="sakit" autocomplete="off">
+              <label class="btn btn-outline-danger flex-fill py-2 fw-semibold" for="option-sakit">Sakit</label>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="alasanIzin" class="form-label small fw-bold text-secondary text-uppercase">Alasan Keterangan</label>
+            <textarea class="form-control" id="alasanIzin" name="alasanIzin" rows="3" placeholder="Tuliskan keterangan detail..." required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm">
+            KIRIM PENGAJUAN
+          </button>
+        </form>
+
+      <% } else if (todayPresensi.jenis_presensi === 'hadir' && !todayPresensi.waktu_pulang) { %>
+        <!-- Form Pulang -->
+        <form id="formPresensiPulang">
+          <input type="hidden" name="latitude" class="user-lat">
+          <input type="hidden" name="longitude" class="user-lng">
+
+          <div class="mb-3">
+            <label for="isiJurnal" class="form-label small fw-bold text-secondary text-uppercase">Jurnal Kegiatan Belajar Hari Ini</label>
+            <textarea class="form-control" id="isiJurnal" name="isiJurnal" rows="4" placeholder="Tuliskan apa yang dipelajari hari ini..." required></textarea>
+          </div>
+
+          <button type="submit" id="btn-submit-pulang" class="btn btn-success btn-lg w-100 py-3 fw-bold rounded-3" disabled>
+            KIRIM PRESENSI PULANG
+          </button>
+          <div class="mt-2 text-center text-danger small fw-semibold" id="btn-pulang-warning">
+            Menunggu koordinat GPS yang valid di dalam radius sekolah...
+          </div>
+        </form>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Setup settings
+  const schoolLat = parseFloat("<%= settings.latitude_sekolah %>") || -6.793208;
+  const schoolLng = parseFloat("<%= settings.longitude_sekolah %>") || 110.865485;
+  const schoolRadius = parseFloat("<%= settings.radius_gps_meter %>") || 100;
+
+  // Leaflet Map settings
+  let map, schoolCircle, userMarker, routingLine;
+
+  function initMap() {
+    map = L.map('map', { zoomControl: false }).setView([schoolLat, schoolLng], 16);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // School Marker
+    L.marker([schoolLat, schoolLng]).addTo(map)
+      .bindPopup('<b>Sekolah (UMK)</b>');
+
+    // Radius Circle
+    schoolCircle = L.circle([schoolLat, schoolLng], {
+      color: '#0d6efd',
+      fillColor: '#0d6efd',
+      fillOpacity: 0.1,
+      radius: schoolRadius
+    }).addTo(map);
+  }
+
+  // Set choice toggle (Hadir vs Izin)
+  function setChoice(choice) {
+    const btnHadir = document.getElementById('btn-choice-hadir');
+    const btnIzin = document.getElementById('btn-choice-izin');
+    const formHadir = document.getElementById('formPresensiMasukHadir');
+    const formIzin = document.getElementById('formPresensiMasukIzin');
+    const mapCard = document.getElementById('map').parentElement;
+    const gpsCard = document.getElementById('gps-status-badge').parentElement.parentElement.parentElement;
+
+    if (choice === 'hadir') {
+      btnHadir.className = 'btn btn-primary flex-fill py-2 fw-semibold';
+      btnIzin.className = 'btn btn-outline-secondary flex-fill py-2 fw-semibold';
+      formHadir.classList.remove('d-none');
+      formIzin.classList.add('d-none');
+      mapCard.classList.remove('d-none');
+      gpsCard.classList.remove('d-none');
+      map.invalidateSize();
+    } else {
+      btnHadir.className = 'btn btn-outline-secondary flex-fill py-2 fw-semibold';
+      btnIzin.className = 'btn btn-primary flex-fill py-2 fw-semibold';
+      formHadir.classList.add('d-none');
+      formIzin.classList.remove('d-none');
+      mapCard.classList.add('d-none');
+      gpsCard.classList.add('d-none');
+    }
+  }
+
+  // Haversine distance calculator
+  function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371e3; // Earth radius in meters
+    const phi1 = (lat1 * Math.PI) / 180;
+    const phi2 = (lat2 * Math.PI) / 180;
+    const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
+    const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
+
+    const a =
+      Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+      Math.cos(phi1) *
+        Math.cos(phi2) *
+        Math.sin(deltaLambda / 2) *
+        Math.sin(deltaLambda / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // meters
+  }
+
+  // GPS tracking updates
+  function updateGPS() {
+    if (!navigator.geolocation) {
+      const badge = document.getElementById('gps-status-badge');
+      if (badge) {
+        badge.className = 'badge bg-danger py-2 px-3 text-white';
+        badge.innerText = 'Tidak Didukung';
+      }
+      document.getElementById('gps-distance-text').innerText = 'Browser tidak mendukung GPS.';
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const userLat = position.coords.latitude;
+        const userLng = position.coords.longitude;
+
+        // Save coords to inputs
+        document.querySelectorAll('.user-lat').forEach(input => input.value = userLat);
+        document.querySelectorAll('.user-lng').forEach(input => input.value = userLng);
+
+        // Calculate distance
+        const distance = calculateDistance(userLat, userLng, schoolLat, schoolLng);
+        const isInside = distance <= schoolRadius;
+        
+        const badge = document.getElementById('gps-status-badge');
+        const distanceText = document.getElementById('gps-distance-text');
+        const btnMasukWarning = document.getElementById('btn-masuk-warning');
+        const btnPulangWarning = document.getElementById('btn-pulang-warning');
+
+        if (distanceText) {
+          distanceText.innerText = `Jarak Anda: ${Math.round(distance)} meter dari sekolah.`;
+        }
+
+        if (isInside) {
+          if (badge) {
+            badge.className = 'badge bg-success py-2 px-3 text-white';
+            badge.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i> Di Dalam Radius';
+          }
+          
+          const btnMasuk = document.getElementById('btn-submit-masuk-hadir');
+          if (btnMasuk) {
+            btnMasuk.removeAttribute('disabled');
+            if (btnMasukWarning) btnMasukWarning.innerText = '';
+          }
+
+          const btnPulang = document.getElementById('btn-submit-pulang');
+          if (btnPulang) {
+            btnPulang.removeAttribute('disabled');
+            if (btnPulangWarning) btnPulangWarning.innerText = '';
+          }
+        } else {
+          if (badge) {
+            badge.className = 'badge bg-danger py-2 px-3 text-white';
+            badge.innerHTML = '<i class="fa-solid fa-circle-exclamation me-1"></i> Di Luar Radius';
+          }
+
+          const btnMasuk = document.getElementById('btn-submit-masuk-hadir');
+          if (btnMasuk) {
+            btnMasuk.setAttribute('disabled', 'true');
+            if (btnMasukWarning) {
+              btnMasukWarning.innerText = `Presensi terkunci: Anda di luar radius sekolah (${Math.round(distance)}m).`;
+            }
+          }
+
+          const btnPulang = document.getElementById('btn-submit-pulang');
+          if (btnPulang) {
+            btnPulang.setAttribute('disabled', 'true');
+            if (btnPulangWarning) {
+              btnPulangWarning.innerText = `Presensi terkunci: Anda di luar radius sekolah (${Math.round(distance)}m).`;
+            }
+          }
+        }
+
+        // Update map marker
+        if (userMarker) {
+          userMarker.setLatLng([userLat, userLng]);
+        } else {
+          userMarker = L.marker([userLat, userLng], {
+            icon: L.icon({
+              iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+              shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+              iconSize: [25, 41],
+              iconAnchor: [12, 41],
+              popupAnchor: [1, -34],
+              shadowSize: [41, 41]
+            })
+          }).addTo(map);
+        }
+
+        // Draw routing line
+        if (routingLine) {
+          routingLine.setLatLngs([[schoolLat, schoolLng], [userLat, userLng]]);
+        } else {
+          routingLine = L.polyline([[schoolLat, schoolLng], [userLat, userLng]], {
+            color: '#6c757d',
+            dashArray: '5, 8',
+            weight: 2
+          }).addTo(map);
+        }
+
+        // Zoom map to show both markers
+        const bounds = L.latLngBounds([
+          [schoolLat, schoolLng],
+          [userLat, userLng]
+        ]);
+        map.fitBounds(bounds.pad(0.2));
+      },
+      (error) => {
+        console.error("GPS Tracking Error:", error);
+        const badge = document.getElementById('gps-status-badge');
+        const distanceText = document.getElementById('gps-distance-text');
+
+        let errorMsg = 'Izin lokasi ditolak.';
+        if (error.code === 2) errorMsg = 'Sinyal GPS hilang.';
+        if (error.code === 3) errorMsg = 'GPS timeout.';
+
+        if (badge) {
+          badge.className = 'badge bg-warning text-dark py-2 px-3';
+          badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i> GPS Eror';
+        }
+        if (distanceText) {
+          distanceText.innerText = `Eror GPS: ${errorMsg} Aktifkan lokasi gawai Anda.`;
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    initMap();
+    updateGPS();
+    
+    // Silent GPS refresh every 10 seconds
+    setInterval(updateGPS, 10000);
+  });
+
+  // AJAX Submissions
+  // 1. Submit Masuk (Hadir)
+  const formMasukHadir = document.getElementById('formPresensiMasukHadir');
+  if (formMasukHadir) {
+    formMasukHadir.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const jenisPresensi = this.querySelector('input[name="jenisPresensi"]').value;
+      const latitude = this.querySelector('input[name="latitude"]').value;
+      const longitude = this.querySelector('input[name="longitude"]').value;
+
+      if (!latitude || !longitude) {
+        Swal.fire({ icon: 'error', title: 'Eror', text: 'GPS koordinat tidak terdeteksi. Aktifkan lokasi Anda!' });
+        return;
+      }
+
+      Swal.fire({ title: 'Mengirim...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+      try {
+        const response = await fetch('/api/presensi/masuk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jenisPresensi, latitude, longitude })
+        });
+        const result = await response.json();
+        Swal.close();
+
+        if (response.ok && result.success) {
+          Swal.fire({ icon: 'success', title: 'Berhasil', text: result.message }).then(() => window.location.href = '/');
+        } else {
+          throw new Error(result.message || 'Gagal menyimpan.');
+        }
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'Gagal', text: err.message });
+      }
+    });
+  }
+
+  // 2. Submit Masuk (Izin/Sakit)
+  const formMasukIzin = document.getElementById('formPresensiMasukIzin');
+  if (formMasukIzin) {
+    formMasukIzin.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const jenisPresensi = this.querySelector('input[name="jenisPresensi"]:checked').value;
+      const alasanIzin = document.getElementById('alasanIzin').value;
+
+      if (!alasanIzin.trim()) {
+        Swal.fire({ icon: 'error', title: 'Peringatan', text: 'Alasan keterangan wajib diisi!' });
+        return;
+      }
+
+      Swal.fire({ title: 'Mengirim...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+      try {
+        const response = await fetch('/api/presensi/masuk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jenisPresensi, alasanIzin })
+        });
+        const result = await response.json();
+        Swal.close();
+
+        if (response.ok && result.success) {
+          Swal.fire({ icon: 'success', title: 'Berhasil', text: result.message }).then(() => window.location.href = '/');
+        } else {
+          throw new Error(result.message || 'Gagal merekam pengajuan.');
+        }
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'Gagal', text: err.message });
+      }
+    });
+  }
+
+  // 3. Submit Pulang
+  const formPulang = document.getElementById('formPresensiPulang');
+  if (formPulang) {
+    formPulang.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const latitude = this.querySelector('input[name="latitude"]').value;
+      const longitude = this.querySelector('input[name="longitude"]').value;
+      const isiJurnal = document.getElementById('isiJurnal').value;
+
+      if (!latitude || !longitude) {
+        Swal.fire({ icon: 'error', title: 'Eror', text: 'GPS koordinat tidak terdeteksi. Aktifkan lokasi Anda!' });
+        return;
+      }
+
+      if (!isiJurnal.trim()) {
+        Swal.fire({ icon: 'error', title: 'Peringatan', text: 'Isi catatan jurnal harian wajib diisi!' });
+        return;
+      }
+
+      Swal.fire({ title: 'Mengirim...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+      try {
+        const response = await fetch('/api/presensi/pulang', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ latitude, longitude, isiJurnal })
+        });
+        const result = await response.json();
+        Swal.close();
+
+        if (response.ok && result.success) {
+          Swal.fire({ icon: 'success', title: 'Berhasil', text: result.message }).then(() => window.location.href = '/');
+        } else {
+          throw new Error(result.message || 'Gagal menyimpan.');
+        }
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'Gagal', text: err.message });
+      }
+    });
+  }
+</script>
+
+<%- include('../../partials/footer') %>
