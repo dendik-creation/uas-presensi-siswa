@@ -1,9 +1,44 @@
 <%- include('../../partials/header') %>
-<div class="card shadow-sm border-0 p-5 bg-white text-dark my-4">
-  <div class="text-center py-4">
-    <i class="fa-solid fa-user-pen text-primary fa-4x mb-3"></i>
-    <h2 class="fw-bold">Ubah Data Siswa</h2>
-    <p class="text-secondary">Fitur pengubahan data siswa dinonaktifkan sementara.</p>
-  </div>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0 text-dark">Ubah Data Siswa</h4>
+                </div>
+                <div class="card-body">
+                    <form action="/admin/siswa/update/<%= siswa.id %>" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Username / NIS</label>
+                            <input type="text" name="username" class="form-control bg-light" value="<%= siswa.username %>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Password Baru <span class="text-muted fw-normal">(Kosongkan jika tidak ingin mengubah password)</span></label>
+                            <input type="password" name="password" class="form-control bg-light" placeholder="Masukkan sandi baru">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nama Lengkap</label>
+                            <input type="text" name="nama_lengkap" class="form-control bg-light" value="<%= siswa.nama_lengkap %>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Kelas</label>
+                            <input type="text" name="kelas" class="form-control bg-light" value="<%= siswa.kelas %>" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">No. HP / WhatsApp</label>
+                            <input type="text" name="no_hp" class="form-control bg-light" value="<%= siswa.no_hp %>">
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="/admin/siswa" class="btn btn-secondary">Batal</a>
+                            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
 <%- include('../../partials/footer') %>
