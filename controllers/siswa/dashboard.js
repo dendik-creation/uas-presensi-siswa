@@ -323,9 +323,43 @@ const getPresensiPage = async (req, res, next) => {
   }
 };
 
+/*
+|-------------------------------------------------------------------------------
+| getPresensiHistoryPage
+|-------------------------------------------------------------------------------
+| URL:            /presensi
+| Controller:     siswa/dashboard@getPresensiHistoryPage
+| Method:         GET
+| Description:    Renders the student presence logs history with filters and download options
+*/
+const getPresensiHistoryPage = async (req, res, next) => {
+  try {
+    const siswaId = req.user.id;
+    const { tanggal_mulai, tanggal_akhir, jenis_presensi } = req.query;
+
+    const filters = {
+      tanggal_mulai: tanggal_mulai || null,
+      tanggal_akhir: tanggal_akhir || null,
+      jenis_presensi: jenis_presensi || null
+    };
+
+    const history = await Presensi.getPresensiHistoryFiltered(siswaId, filters);
+
+    return res.render("siswa/presensi/index", {
+      title: "Riwayat Presensi Saya - EPresensi",
+      activePage: "presensi",
+      history,
+      filters
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 module.exports = {
   getDashboardPage,
   submitPresensiMasuk,
   submitPresensiPulang,
   getPresensiPage,
+  getPresensiHistoryPage,
 };

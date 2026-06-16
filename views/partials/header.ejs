@@ -76,6 +76,11 @@
                   <i class="fa-solid fa-house me-1"></i> Dashboard
                 </a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link <%= typeof activePage !== 'undefined' && activePage === 'presensi' ? 'active fw-bold text-primary' : '' %>" href="/presensi">
+                  <i class="fa-solid fa-clipboard-user me-1"></i> Riwayat Presensi
+                </a>
+              </li>
             <% } %>
           </ul>
 

@@ -94,6 +94,36 @@ class Presensi {
 
   /*
   |-------------------------------------------------------------------------------
+  | Get Filtered Presence History for Student
+  |-------------------------------------------------------------------------------
+  | Method:         getPresensiHistoryFiltered
+  | Description:    Gets student's presence records with optional date and status filters
+  */
+  static async getPresensiHistoryFiltered(siswaId, filters = {}) {
+    let query = "SELECT * FROM presensi WHERE siswa_id = ?";
+    const params = [siswaId];
+
+    if (filters.tanggal_mulai) {
+      query += " AND DATE(created_at) >= ?";
+      params.push(filters.tanggal_mulai);
+    }
+    if (filters.tanggal_akhir) {
+      query += " AND DATE(created_at) <= ?";
+      params.push(filters.tanggal_akhir);
+    }
+    if (filters.jenis_presensi && filters.jenis_presensi !== "semua") {
+      query += " AND jenis_presensi = ?";
+      params.push(filters.jenis_presensi);
+    }
+
+    query += " ORDER BY created_at DESC";
+
+    const [rows] = await db.query(query, params);
+    return rows;
+  }
+
+  /*
+  |-------------------------------------------------------------------------------
   | Get All Presence Logs
   |-------------------------------------------------------------------------------
   | Method:         getAllPresensiLogs

@@ -142,7 +142,7 @@ Berikut adalah detail pembagian tugas tim dari Notion yang telah disesuaikan den
 ### **Labibah Rohmah**
 - [x] Fitur Update Profil Diri: Logic model & API update nama dan kontak No. HP
 - [x] Design UI Halaman Profil Diri: Halaman form ubah data profil & reset kata sandi EJS
-- [ ] Fitur Rekap Presensi: Tabel riwayat absensi pada role siswa, cetak PDF, ekspor CSV, & filter data presensi (Logic server dan ui frontend)
+- [x] Fitur Rekap Presensi: Tabel riwayat absensi pada role siswa, cetak PDF, & filter data presensi (Logic server dan ui frontend)
 
 ---
 
