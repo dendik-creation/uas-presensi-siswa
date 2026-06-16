@@ -76,23 +76,23 @@ Gunakan daftar ini untuk mengetahui fitur apa saja yang sudah selesai (`[x]`) da
 
 ### **Dendi' Setiawan (Sistem Login & Presensi GPS)**
 - [x] Rancang Schema Database
-- [x] Fitur Autentikasi: Rancang middleware session (`authOnly`), logic login/logout controller, & enkripsi multi-hash
-- [ ] Fitur Presensi: Logic controller, model, & rute API presensi masuk & pulang berbasis validasi GPS (rumus Haversine)
-- [ ] Fitur Presensi Izin: Logic pengajuan izin/sakit tanpa GPS
+- [x] Fitur Autentikasi: Rancang middleware session (`authOnly`, `roleOnly`), logic login/logout controller, & enkripsi multi-hash
+- [x] Fitur Presensi: Logic controller, model, & rute API presensi masuk & pulang berbasis validasi GPS (rumus Haversine)
+- [x] Fitur Presensi Izin: Logic pengajuan izin/sakit tanpa GPS
 
-### **Naufal Rizqi Ilham Gibran (Pengaturan & Laporan)**
+### **Naufal Rizqi Ilham Gibran (Pengaturan & Rekap Presensi (Admin))**
 - [x] Rancang Schema Database & Membuat Flowchart
 - [x] Desain UI Login: Rancang halaman masuk web (`login.ejs`) light mode
 - [x] Fitur Pengaturan Global: Query model & API controller pengaturan sekolah (`pengaturan` table)
-- [x] Design UI Dashboard Admin & Pengaturan: View pengaturan EJS & integrasi Leaflet map UMK
-- [ ] Fitur Laporan: Log rekapitulasi, cetak PDF, ekspor CSV, & filter data presensi
-- [ ] Desain UI Dashboard Siswa: Tampilan antarmuka gawai & pendeteksi jarak GPS
+- [x] Design UI Dashboard Admin & Pengaturan: View pengaturan EJS & integrasi Leaflet map
+- [x] Desain UI Dashboard Siswa: Tampilan antarmuka gawai & pendeteksi jarak GPS
+- [ ] Fitur Rekap Presensi: Tabel riwayat absensi pada role admin, cetak PDF, ekspor CSV, & filter data presensi (Logic server dan ui frontend)
 
 ### **Alvina Salsabilla (Manajemen Siswa CRUD)**
 - [ ] Fitur Manajemen Siswa: Controller & Model API CRUD siswa
 - [ ] Design UI Manajemen Siswa: Halaman tabel siswa, form tambah, dan form ubah EJS
 
-### **Labibah Rohmah (Profil & Histori)**
+### **Labibah Rohmah (Profil & Rekap Presensi (Siswa))**
 - [x] Fitur Update Profil Diri: Logic model & API update nama dan kontak No. HP
 - [x] Design UI Halaman Profil Diri: Halaman form ubah data profil & reset kata sandi EJS
-- [ ] Design Histori Presensi Siswa: Tabel log riwayat kehadiran individu di dashboard siswa
+- [ ] Fitur Rekap Presensi: Tabel riwayat absensi pada role siswa, cetak PDF, ekspor CSV, & filter data presensi (Logic server dan ui frontend)

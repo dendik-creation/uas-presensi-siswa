@@ -1,13 +1,19 @@
+const db = require("../config/db");
+
 class Presensi {
   /*
   |-------------------------------------------------------------------------------
   | Get Today's Presence
   |-------------------------------------------------------------------------------
   | Method:         getPresensiToday
-  | Description:    Gets today's presence record for student (LEGACY - EMPTIED)
+  | Description:    Gets today's presence record for student
   */
   static async getPresensiToday(siswaId) {
-    return null;
+    const [rows] = await db.query(
+      "SELECT * FROM presensi WHERE siswa_id = ? AND DATE(created_at) = CURDATE() LIMIT 1",
+      [siswaId]
+    );
+    return rows[0] || null;
   }
 
   /*
@@ -15,10 +21,14 @@ class Presensi {
   | Get Presence History
   |-------------------------------------------------------------------------------
   | Method:         getPresensiHistory
-  | Description:    Gets all past presence records for student (LEGACY - EMPTIED)
+  | Description:    Gets all past presence records for student
   */
   static async getPresensiHistory(siswaId) {
-    return [];
+    const [rows] = await db.query(
+      "SELECT * FROM presensi WHERE siswa_id = ? ORDER BY created_at DESC",
+      [siswaId]
+    );
+    return rows;
   }
 
   /*
@@ -26,10 +36,32 @@ class Presensi {
   | Record Presence Entry
   |-------------------------------------------------------------------------------
   | Method:         recordPresensiMasuk
-  | Description:    Records presence check-in details (LEGACY - EMPTIED)
+  | Description:    Records presence check-in details (Hadir, Sakit, or Izin)
   */
   static async recordPresensiMasuk(data) {
-    return null;
+    const [result] = await db.query(
+      `INSERT INTO presensi (
+        siswa_id, 
+        jenis_presensi, 
+        waktu_masuk, 
+        latitude_masuk, 
+        longitude_masuk, 
+        jarak_masuk, 
+        status_gps, 
+        alasan_izin, 
+        created_at
+      ) VALUES (?, ?, NOW(), ?, ?, ?, ?, ?, NOW())`,
+      [
+        data.siswaId,
+        data.jenisPresensi,
+        data.latitude || null,
+        data.longitude || null,
+        data.jarak || null,
+        data.statusGps,
+        data.alasanIzin || null
+      ]
+    );
+    return result.insertId;
   }
 
   /*
@@ -37,10 +69,27 @@ class Presensi {
   | Record Presence Exit
   |-------------------------------------------------------------------------------
   | Method:         recordPresensiPulang
-  | Description:    Records presence check-out details (LEGACY - EMPTIED)
+  | Description:    Records presence check-out details (updates today's check-in log)
   */
   static async recordPresensiPulang(siswaId, data) {
-    return false;
+    const [result] = await db.query(
+      `UPDATE presensi SET 
+        waktu_pulang = NOW(), 
+        latitude_pulang = ?, 
+        longitude_pulang = ?, 
+        jarak_pulang = ?, 
+        isi_jurnal = ?, 
+        updated_at = NOW() 
+       WHERE siswa_id = ? AND DATE(created_at) = CURDATE() AND jenis_presensi = 'hadir'`,
+      [
+        data.latitude || null,
+        data.longitude || null,
+        data.jarak || null,
+        data.isiJurnal || null,
+        siswaId
+      ]
+    );
+    return result.affectedRows > 0;
   }
 
   /*
