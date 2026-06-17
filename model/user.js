@@ -115,13 +115,14 @@ class User {
   */
   static async createSiswa(data) {
     const query = `
-      INSERT INTO users (username, password, nama, kelas, no_hp, role, is_active, created_at)
-      VALUES (?, ?, ?, ?, ?, 'siswa', 1, NOW())
+      INSERT INTO users (username, password, nama, nomor_induk, kelas, no_hp, role, is_active, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, 'siswa', 1, NOW())
     `;
     const params = [
       data.username, 
       data.password, 
       data.nama_lengkap, 
+      data.username, 
       data.kelas, 
       data.no_hp || null
     ];
@@ -134,10 +135,11 @@ class User {
   |-------------------------------------------------------------------------------
   | Update Siswa Record
   |-------------------------------------------------------------------------------
+  | Description:    Updates existing student details in database
   */
   static async updateSiswa(id, data) {
-    let query = "UPDATE users SET username = ?, nama = ?, kelas = ?, no_hp = ?, updated_at = NOW()";
-    const params = [data.username, data.nama_lengkap, data.kelas, data.no_hp || null];
+    let query = "UPDATE users SET username = ?, nomor_induk = ?, nama = ?, kelas = ?, no_hp = ?, updated_at = NOW()";
+    const params = [data.username, data.username, data.nama_lengkap, data.kelas, data.no_hp || null];
 
     if (data.password) {
       query += ", password = ?";

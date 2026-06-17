@@ -1,44 +1,62 @@
 <%- include('../../partials/header') %>
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white">
-                    <h4 class="mb-0 text-dark">Ubah Data Siswa</h4>
-                </div>
-                <div class="card-body">
-                    <form action="/api/admin/siswa/update/<%= siswa.id %>" method="POST">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Username / NIS</label>
-                            <input type="text" name="username" class="form-control bg-light" value="<%= siswa.username %>" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Password Baru <span class="text-muted fw-normal">(Kosongkan jika tidak ingin mengubah password)</span></label>
-                            <input type="password" name="password" class="form-control bg-light" placeholder="Masukkan sandi baru">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Nama Lengkap</label>
-                            <input type="text" name="nama_lengkap" class="form-control bg-light" value="<%= siswa.nama_lengkap %>" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Kelas</label>
-                            <input type="text" name="kelas" class="form-control bg-light" value="<%= siswa.kelas %>" required>
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">No. HP / WhatsApp</label>
-                            <input type="text" name="no_hp" class="form-control bg-light" value="<%= siswa.no_hp %>">
-                        </div>
-                        
-                        <div class="d-flex justify-content-between">
-                            <a href="/admin/siswa" class="btn btn-secondary">Batal</a>
-                            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+<div class="container py-2" style="max-width: 900px;">
+  <!-- Header Bar -->
+  <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+    <div>
+      <h4 class="fw-bold mb-0 text-primary"><i class="fa-solid fa-user-pen me-2"></i> Ubah Siswa</h4>
+      <p class="text-muted mb-0 small">Ubah Rincian Informasi dan Kredensial Siswa</p>
     </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card border-0 shadow-sm bg-white" style="border-radius: 16px;">
+        <div class="card-header border-0 bg-transparent pt-4 px-4 pb-0">
+          <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-pen-to-square text-muted me-2"></i>Form Ubah Data Siswa</h6>
+        </div>
+        <div class="card-body p-4">
+          <form action="/api/admin/siswa/update/<%= siswa.id %>" method="POST">
+            <!-- Username / NIS -->
+            <div class="mb-3">
+              <label class="form-label small fw-semibold text-secondary"><i class="fa-solid fa-id-card me-1 text-primary"></i> Username / NIS</label>
+              <input type="text" name="username" class="form-control bg-light border-0 py-2" style="border-radius: 8px;" value="<%= siswa.username %>" required>
+              <div class="form-text text-muted small">Username ini akan digunakan untuk NIS sekaligus kredensial masuk portal.</div>
+            </div>
+
+            <!-- Password Baru -->
+            <div class="mb-3">
+              <label class="form-label small fw-semibold text-secondary"><i class="fa-solid fa-key me-1 text-primary"></i> Kata Sandi Baru <span class="text-muted fw-normal">(Opsional)</span></label>
+              <input type="password" name="password" class="form-control bg-light border-0 py-2" style="border-radius: 8px;" placeholder="Kosongkan jika tidak ingin mengubah sandi">
+            </div>
+
+            <!-- Nama Lengkap -->
+            <div class="mb-3">
+              <label class="form-label small fw-semibold text-secondary"><i class="fa-solid fa-signature me-1 text-primary"></i> Nama Lengkap</label>
+              <input type="text" name="nama_lengkap" class="form-control bg-light border-0 py-2" style="border-radius: 8px;" value="<%= siswa.nama_lengkap %>" required>
+            </div>
+
+            <!-- Kelas -->
+            <div class="mb-3">
+              <label class="form-label small fw-semibold text-secondary"><i class="fa-solid fa-school me-1 text-primary"></i> Kelas</label>
+              <input type="text" name="kelas" class="form-control bg-light border-0 py-2" style="border-radius: 8px;" value="<%= siswa.kelas %>" required>
+            </div>
+
+            <!-- No. HP -->
+            <div class="mb-4">
+              <label class="form-label small fw-semibold text-secondary"><i class="fa-solid fa-phone me-1 text-primary"></i> Nomor HP / WhatsApp</label>
+              <input type="text" name="no_hp" class="form-control bg-light border-0 py-2" style="border-radius: 8px;" value="<%= siswa.no_hp || '' %>" placeholder="Contoh: 08123456789">
+            </div>
+
+            <div class="d-flex justify-content-between pt-2 border-top">
+              <a href="/admin/siswa" class="btn btn-light px-4" style="border-radius: 8px;"><i class="fa-solid fa-xmark me-1"></i> Batal</a>
+              <button type="submit" class="btn btn-primary px-4" style="border-radius: 8px;"><i class="fa-solid fa-floppy-disk me-1"></i> Simpan Perubahan</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <%- include('../../partials/footer') %>

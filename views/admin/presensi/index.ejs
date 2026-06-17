@@ -1,9 +1,234 @@
 <%- include('../../partials/header') %>
-<div class="card shadow-sm border-0 p-5 bg-white text-dark my-4">
-  <div class="text-center py-4">
-    <i class="fa-solid fa-clipboard-user text-primary fa-4x mb-3"></i>
-    <h2 class="fw-bold">Rekap Presensi Siswa</h2>
-    <p class="text-secondary">Fitur rekapitulasi presensi dinonaktifkan sementara.</p>
+
+<style>
+  @media print {
+    body {
+      background-color: #ffffff !important;
+      color: #000000 !important;
+      font-size: 12px;
+    }
+    .no-print, 
+    nav, 
+    footer, 
+    .btn, 
+    .card-header, 
+    form, 
+    .filter-card, 
+    .alert {
+      display: none !important;
+    }
+    .container {
+      max-width: 100% !important;
+      width: 100% !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    .card {
+      border: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+    }
+    .card-body {
+      padding: 0 !important;
+    }
+    .table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+    }
+    .table th, .table td {
+      border: 1px solid #000000 !important;
+      padding: 6px !important;
+      color: #000000 !important;
+    }
+    .print-header {
+      display: block !important;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .print-header h3 {
+      margin: 0;
+      font-weight: bold;
+    }
+    .print-header p {
+      margin: 5px 0 0 0;
+      color: #666;
+    }
+  }
+
+  .print-header {
+    display: none;
+  }
+</style>
+
+<div class="container py-2" style="max-width: 1000px;">
+  <!-- Print Header (Only visible on paper/PDF print) -->
+  <div class="print-header">
+    <h3>REKAPITULASI PRESENSI SISWA</h3>
+    <p>Sistem EPresensi Sekolah &bull; Tanggal Cetak: <%= new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) %></p>
+    <hr style="border-top: 2px solid #000; margin-top: 15px; margin-bottom: 20px;">
+  </div>
+
+  <!-- Breadcrumb & Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3 no-print">
+    <div>
+      <h4 class="fw-bold mb-0 text-primary"><i class="fa-solid fa-clipboard-user me-2"></i> Rekap Presensi</h4>
+      <p class="text-muted mb-0 small">Riwayat dan Rekapitulasi Kehadiran Siswa</p>
+    </div>
+    <div>
+      <button onclick="window.print()" class="btn btn-outline-primary fw-semibold rounded-pill">
+        <i class="fa-solid fa-print me-1"></i> Cetak PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter Card -->
+  <div class="card border-0 shadow-sm bg-white mb-4 no-print" style="border-radius: 16px;">
+    <div class="card-body p-4">
+      <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-filter text-primary me-2"></i>Filter Data Rekap</h6>
+      <form action="/admin/presensi" method="GET">
+        <div class="row g-3">
+          <!-- Start Date -->
+          <div class="col-md-3 col-sm-6">
+            <label class="form-label small fw-semibold text-secondary">Tanggal Mulai</label>
+            <input type="date" name="start_date" class="form-control form-control-sm bg-light border-0" style="border-radius: 8px;" value="<%= filters.start_date %>">
+          </div>
+          <!-- End Date -->
+          <div class="col-md-3 col-sm-6">
+            <label class="form-label small fw-semibold text-secondary">Tanggal Selesai</label>
+            <input type="date" name="end_date" class="form-control form-control-sm bg-light border-0" style="border-radius: 8px;" value="<%= filters.end_date %>">
+          </div>
+          <!-- Kelas -->
+          <div class="col-md-2 col-sm-6">
+            <label class="form-label small fw-semibold text-secondary">Kelas</label>
+            <select name="kelas" class="form-select form-select-sm bg-light border-0" style="border-radius: 8px;">
+              <option value="">Semua Kelas</option>
+              <% classes.forEach(c => { %>
+                <option value="<%= c %>" <%= filters.kelas === c ? 'selected' : '' %>><%= c %></option>
+              <% }) %>
+            </select>
+          </div>
+          <!-- Status -->
+          <div class="col-md-2 col-sm-6">
+            <label class="form-label small fw-semibold text-secondary">Status</label>
+            <select name="status" class="form-select form-select-sm bg-light border-0" style="border-radius: 8px;">
+              <option value="">Semua Status</option>
+              <option value="hadir" <%= filters.status === 'hadir' ? 'selected' : '' %>>Hadir</option>
+              <option value="izin" <%= filters.status === 'izin' ? 'selected' : '' %>>Izin</option>
+              <option value="sakit" <%= filters.status === 'sakit' ? 'selected' : '' %>>Sakit</option>
+              <option value="alpa" <%= filters.status === 'alpa' ? 'selected' : '' %>>Alpa</option>
+            </select>
+          </div>
+          <!-- Keyword Search -->
+          <div class="col-md-2 col-sm-12">
+            <label class="form-label small fw-semibold text-secondary">Cari Siswa</label>
+            <input type="text" name="keyword" class="form-control form-control-sm bg-light border-0" style="border-radius: 8px;" placeholder="Nama / NIS..." value="<%= filters.keyword %>">
+          </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <a href="/admin/presensi" class="btn btn-sm btn-light px-3" style="border-radius: 8px;"><i class="fa-solid fa-rotate-left me-1"></i>Reset</a>
+          <button type="submit" class="btn btn-sm btn-primary px-4" style="border-radius: 8px;"><i class="fa-solid fa-magnifying-glass me-1"></i>Filter</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="card border-0 shadow-sm bg-white" style="border-radius: 16px;">
+    <div class="card-body p-4">
+      <!-- Active Filter Badges Info (Only printed/shown for clarification) -->
+      <div class="mb-3 d-none d-print-block">
+        <span class="small text-secondary">
+          Filter: 
+          <% if (filters.start_date || filters.end_date) { %>
+            Tanggal (<%= filters.start_date || 'Awal' %> s/d <%= filters.end_date || 'Akhir' %>) &bull;
+          <% } %>
+          <% if (filters.kelas) { %>
+            Kelas: <%= filters.kelas %> &bull;
+          <% } %>
+          <% if (filters.status) { %>
+            Status: <%= filters.status %> &bull;
+          <% } %>
+          <% if (filters.keyword) { %>
+            Pencarian: "<%= filters.keyword %>"
+          <% } %>
+          <% if (!filters.start_date && !filters.end_date && !filters.kelas && !filters.status && !filters.keyword) { %>
+            Semua Data
+          <% } %>
+        </span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" style="font-size: 13.5px;">
+          <thead class="table-light text-secondary small text-uppercase">
+            <tr>
+              <th style="width: 5%;" class="text-center">No</th>
+              <th style="width: 15%;">Tanggal</th>
+              <th style="width: 25%;">Nama Siswa / NIS</th>
+              <th style="width: 10%;" class="text-center">Kelas</th>
+              <th style="width: 12%;" class="text-center">Status</th>
+              <th style="width: 13%;" class="text-center">Masuk</th>
+              <th style="width: 13%;" class="text-center">Pulang</th>
+              <th style="width: 7%;" class="text-center no-print">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (logs && logs.length > 0) { %>
+              <% logs.forEach((log, index) => { %>
+                <%
+                  const dateObj = new Date(log.created_at);
+                  const formattedDate = dateObj.toLocaleDateString('id-ID', {
+                    weekday: 'short',
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                  });
+                %>
+                <tr>
+                  <td class="text-center text-secondary"><%= index + 1 %></td>
+                  <td class="text-secondary fw-semibold"><%= formattedDate %></td>
+                  <td>
+                    <div class="fw-bold text-dark"><%= log.nama_siswa %></div>
+                    <div class="text-muted small">NIS: <%= log.nomor_induk || '-' %></div>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge bg-secondary-subtle text-secondary px-2 py-1"><%= log.kelas || '-' %></span>
+                  </td>
+                  <td class="text-center">
+                    <% if (log.jenis_presensi === 'hadir' || log.jenis_presensi === 'Hadir') { %>
+                      <span class="badge bg-success-subtle text-success fw-medium px-2.5 py-1.5"><i class="fa-solid fa-circle-check me-1"></i>Hadir</span>
+                    <% } else if (log.jenis_presensi === 'izin' || log.jenis_presensi === 'Izin') { %>
+                      <span class="badge bg-info-subtle text-info fw-medium px-2.5 py-1.5"><i class="fa-solid fa-file-signature me-1"></i>Izin</span>
+                    <% } else if (log.jenis_presensi === 'sakit' || log.jenis_presensi === 'Sakit') { %>
+                      <span class="badge bg-warning-subtle text-warning fw-medium px-2.5 py-1.5"><i class="fa-solid fa-head-side-virus me-1"></i>Sakit</span>
+                    <% } else if (log.jenis_presensi === 'alpa' || log.jenis_presensi === 'Alpa') { %>
+                      <span class="badge bg-danger-subtle text-danger fw-medium px-2.5 py-1.5"><i class="fa-solid fa-user-xmark me-1"></i>Alpa</span>
+                    <% } else { %>
+                      <span class="badge bg-light text-dark text-capitalize px-2.5 py-1.5"><%= log.jenis_presensi %></span>
+                    <% } %>
+                  </td>
+                  <td class="text-secondary text-center">
+                    <%= log.waktu_masuk ? new Date(log.waktu_masuk).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB' : '-' %>
+                  </td>
+                  <td class="text-secondary text-center">
+                    <%= log.waktu_pulang ? new Date(log.waktu_pulang).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB' : '-' %>
+                  </td>
+                  <td class="text-center no-print">
+                    <a href="/admin/presensi/detail/<%= log.id %>" class="btn btn-sm btn-outline-primary py-1 px-2.5" style="border-radius: 6px;" title="Lihat Detail Map / Jurnal">
+                      <i class="fa-solid fa-eye"></i> Detail
+                    </a>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="8" class="text-center text-muted py-4">Tidak ada data riwayat presensi yang sesuai filter.</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
+
 <%- include('../../partials/footer') %>

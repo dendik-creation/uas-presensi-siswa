@@ -1,134 +1,117 @@
 <%- include('../../partials/header') %>
 
-<style>
-    .tabel-sempurna {
-        border: 1px solid #212529;
-        border-radius: 8px;
-        overflow: hidden;
-    }
-    .tabel-sempurna table {
-        margin-bottom: 0;
-    }
-    
-    .tabel-sempurna th, .tabel-sempurna td {
-        border: 1px solid #212529 !important; 
-    }
-    
-    .tabel-sempurna tr:first-child th { border-top: none !important; }
-    .tabel-sempurna tr:last-child td { border-bottom: none !important; }
-    .tabel-sempurna th:first-child, .tabel-sempurna td:first-child { border-left: none !important; }
-    .tabel-sempurna th:last-child, .tabel-sempurna td:last-child { border-right: none !important; }
-</style>
-
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="text-dark">Manajemen Siswa</h2>
-        <div>
-            <a href="/" class="btn btn-outline-secondary me-2">
-                <i class="fas fa-home"></i> Dashboard
-            </a>
-            <a href="/admin/siswa/tambah" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Tambah Siswa
-            </a>
-        </div>
+<div class="container py-2" style="max-width: 900px;">
+  <!-- Header Bar -->
+  <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+    <div>
+      <h4 class="fw-bold mb-0 text-primary"><i class="fa-solid fa-users me-2"></i> Manajemen Siswa</h4>
+      <p class="text-muted mb-0 small">Kelola Akun Akses & Data Kelas Siswa</p>
     </div>
+  </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive tabel-sempurna">
-                <table class="table table-striped table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th scope="col" class="text-center">No</th>
-                            <th scope="col">Username / NIS</th>
-                            <th scope="col">Nama Lengkap</th>
-                            <th scope="col" class="text-center">Kelas</th>
-                            <th scope="col">No. HP</th>
-                            <th scope="col" class="text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% if (siswa && siswa.length > 0) { %>
-                            <% siswa.forEach((s, index) => { %>
-                                <tr>
-                                    <td class="text-center align-middle"><%= index + 1 %></td>
-                                    <td class="align-middle fw-bold"><%= s.username %></td>
-                                    <td class="align-middle"><%= s.nama_lengkap %></td>
-                                    <td class="text-center align-middle"><span class="badge bg-secondary"><%= s.kelas %></span></td>
-                                    <td class="align-middle"><%= s.no_hp || '-' %></td>
-                                    <td class="text-center align-middle">
-                                        <a href="/admin/siswa/edit/<%= s.id %>" class="btn btn-sm btn-outline-warning" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('<%= s.id %>')" title="Hapus">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            <% }) %>
-                        <% } else { %>
-                            <tr>
-                                <td colspan="6" class="text-center py-4 text-muted">Belum ada data siswa terdaftar.</td>
-                            </tr>
-                        <% } %>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+  <!-- Main Card Table -->
+  <div class="card border-0 shadow-sm bg-white" style="border-radius: 16px;">
+    <div class="card-header border-0 bg-transparent pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+      <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-list text-muted me-2"></i>Daftar Siswa Terdaftar</h6>
+      <a href="/admin/siswa/tambah" class="btn btn-primary btn-sm px-3 rounded-pill fw-semibold shadow-sm">
+        <i class="fa-solid fa-plus me-1"></i> Tambah Siswa
+      </a>
     </div>
+    <div class="card-body p-3">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" style="font-size: 13.5px;">
+          <thead class="table-light text-secondary small text-uppercase">
+            <tr>
+              <th style="width: 5%;" class="text-center">No</th>
+              <th style="width: 30%;">Nama Lengkap</th>
+              <th style="width: 25%;">Username / NIS</th>
+              <th style="width: 15%;" class="text-center">Kelas</th>
+              <th style="width: 15%;">No. HP</th>
+              <th style="width: 10%;" class="text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (siswa && siswa.length > 0) { %>
+              <% siswa.forEach((s, index) => { %>
+                <tr>
+                  <td class="text-center text-secondary"><%= index + 1 %></td>
+                  <td>
+                    <span class="fw-semibold text-dark"><%= s.nama_lengkap %></span>
+                  </td>
+                  <td class="font-monospace text-secondary"><%= s.username %></td>
+                  <td class="text-center">
+                    <span class="badge bg-secondary-subtle text-secondary px-2.5 py-1.5" style="border-radius: 6px;"><%= s.kelas %></span>
+                  </td>
+                  <td class="text-secondary"><%= s.no_hp || '-' %></td>
+                  <td class="text-center">
+                    <div class="d-flex justify-content-center gap-1">
+                      <a href="/admin/siswa/edit/<%= s.id %>" class="btn btn-sm btn-outline-warning p-1 px-2" style="border-radius: 6px;" title="Ubah Detail">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                      </a>
+                      <button class="btn btn-sm btn-outline-danger p-1 px-2" style="border-radius: 6px;" onclick="confirmDelete('<%= s.id %>', '<%= s.nama_lengkap %>')" title="Hapus Siswa">
+                        <i class="fa-solid fa-trash-can"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="6" class="text-center text-muted py-4">Belum ada data siswa terdaftar.</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    function confirmDelete(id) {
-        Swal.fire({
-            title: 'Hapus Siswa?',
-            text: "Data siswa beserta log kehadirannya akan dihapus permanen!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Ya, Hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = `/api/admin/siswa/delete/${id}`; 
-            }
-        })
+  function confirmDelete(id, nama) {
+    Swal.fire({
+      title: 'Hapus Siswa?',
+      text: `Data siswa "${nama}" beserta seluruh log kehadirannya akan dihapus secara permanen!`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Ya, Hapus!',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = `/api/admin/siswa/delete/${id}`;
+      }
+    });
+  }
+
+  // Handle flash messages via URL query params
+  const urlParams = new URLSearchParams(window.location.search);
+  const status = urlParams.get('status');
+  if (status) {
+    let title = 'Berhasil!';
+    let text = '';
+    if (status === 'sukses') {
+      text = 'Data siswa baru berhasil ditambahkan.';
+    } else if (status === 'diperbarui') {
+      text = 'Perubahan data siswa berhasil disimpan.';
+    } else if (status === 'dihapus') {
+      title = 'Terhapus!';
+      text = 'Data siswa telah dihapus secara permanen.';
     }
 
-    const urlParams = new URLSearchParams(window.location.search);
-    
-    if (urlParams.get('status') === 'sukses') {
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: 'Data Siswa baru berhasil ditambahkan.',
-            showConfirmButton: false,
-            timer: 2000
-        });
-        window.history.replaceState(null, null, window.location.pathname);
-        
-    } else if (urlParams.get('status') === 'diperbarui') { 
-        Swal.fire({
-            icon: 'success',
-            title: 'Diperbarui!',
-            text: 'Perubahan data siswa berhasil disimpan.',
-            showConfirmButton: false,
-            timer: 2000
-        });
-        window.history.replaceState(null, null, window.location.pathname);
-        
-    } else if (urlParams.get('status') === 'dihapus') { 
-        Swal.fire({
-            icon: 'success',
-            title: 'Terhapus!',
-            text: 'Data Siswa telah dihapus secara permanen.',
-            showConfirmButton: false,
-            timer: 2000
-        });
-        window.history.replaceState(null, null, window.location.pathname);
+    if (text) {
+      Swal.fire({
+        icon: 'success',
+        title: title,
+        text: text,
+        showConfirmButton: false,
+        timer: 2000
+      });
+      window.history.replaceState(null, null, window.location.pathname);
     }
+  }
 </script>
 
 <%- include('../../partials/footer') %>

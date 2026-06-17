@@ -16,7 +16,7 @@ const getSiswaPage = async (req, res) => {
         res.render('admin/siswa/index', { 
             title: 'Manajemen Siswa',
             siswa: siswaList, 
-            user: req.session.user
+            user: req.user
         });
     } catch (error) {
         console.error("DETAIL ERROR DARI SERVER:", error);
@@ -37,7 +37,7 @@ const getTambahSiswaPage = (req, res) => {
     res.render("admin/siswa/tambah", {
         title: "Tambah Siswa - EPresensi",
         activePage: "siswa",
-        user: req.session.user
+        user: req.user
     });
 };
 
@@ -61,7 +61,7 @@ const getEditSiswaPage = async (req, res, next) => {
             title: "Edit Siswa - EPresensi",
             activePage: "siswa",
             siswa: targetSiswa, 
-            user: req.session.user
+            user: req.user
         });
     } catch (error) {
         console.error("DETAIL ERROR DARI SERVER:", error);

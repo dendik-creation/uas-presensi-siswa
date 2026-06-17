@@ -86,11 +86,11 @@ Gunakan daftar ini untuk mengetahui fitur apa saja yang sudah selesai (`[x]`) da
 - [x] Fitur Pengaturan Global: Query model & API controller pengaturan sekolah (`pengaturan` table)
 - [x] Design UI Dashboard Admin & Pengaturan: View pengaturan EJS & integrasi Leaflet map
 - [x] Desain UI Dashboard Siswa: Tampilan antarmuka gawai & pendeteksi jarak GPS
-- [ ] Fitur Rekap Presensi: Tabel riwayat absensi pada role admin, cetak PDF, & filter data presensi (Logic server dan ui frontend)
+- [x] Fitur Rekap Presensi: Tabel riwayat absensi pada role admin, cetak PDF, & filter data presensi (Logic server dan ui frontend)
 
 ### **Alvina Salsabilla (Manajemen Siswa CRUD)**
-- [ ] Fitur Manajemen Siswa: Controller & Model API CRUD siswa
-- [ ] Design UI Manajemen Siswa: Halaman tabel siswa, form tambah, dan form ubah EJS
+- [x] Fitur Manajemen Siswa: Controller & Model API CRUD siswa
+- [x] Design UI Manajemen Siswa: Halaman tabel siswa, form tambah, dan form ubah EJS
 
 ### **Labibah Rohmah (Profil & Rekap Presensi (Siswa))**
 - [x] Fitur Update Profil Diri: Logic model & API update nama dan kontak No. HP
