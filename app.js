@@ -78,8 +78,8 @@ app.get("/admin/siswa/tambah", roleOnly("admin"), adminSiswaController.getTambah
 app.get("/admin/siswa/edit/:id", roleOnly("admin"), adminSiswaController.getEditSiswaPage);
 
 app.post("/api/admin/siswa", roleOnly("admin"), adminSiswaController.apiCreateSiswa);
-app.put("/api/admin/siswa/:id", roleOnly("admin"), adminSiswaController.apiUpdateSiswa);
-app.delete("/api/admin/siswa/:id", roleOnly("admin"), adminSiswaController.apiDeleteSiswa);
+app.post("/api/admin/siswa/update/:id", roleOnly("admin"), adminSiswaController.apiUpdateSiswa);
+app.get("/api/admin/siswa/delete/:id", roleOnly("admin"), adminSiswaController.apiDeleteSiswa);
 
 // Admin: Attendance logs
 app.get("/admin/presensi", roleOnly("admin"), adminPresensiController.getPresensiPage);

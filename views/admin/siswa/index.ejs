@@ -1,16 +1,41 @@
 <%- include('../../partials/header') %>
 
+<style>
+    .tabel-sempurna {
+        border: 1px solid #212529;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .tabel-sempurna table {
+        margin-bottom: 0;
+    }
+    
+    .tabel-sempurna th, .tabel-sempurna td {
+        border: 1px solid #212529 !important; 
+    }
+    
+    .tabel-sempurna tr:first-child th { border-top: none !important; }
+    .tabel-sempurna tr:last-child td { border-bottom: none !important; }
+    .tabel-sempurna th:first-child, .tabel-sempurna td:first-child { border-left: none !important; }
+    .tabel-sempurna th:last-child, .tabel-sempurna td:last-child { border-right: none !important; }
+</style>
+
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="text-dark">Manajemen Siswa</h2>
-        <a href="/admin/siswa/create" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Tambah Siswa
-        </a>
+        <div>
+            <a href="/" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="/admin/siswa/tambah" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Tambah Siswa
+            </a>
+        </div>
     </div>
 
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
-            <div class="table-responsive">
+            <div class="table-responsive tabel-sempurna">
                 <table class="table table-striped table-hover mb-0">
                     <thead class="table-light">
                         <tr>
@@ -67,9 +92,42 @@
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = `/admin/siswa/delete/${id}`;
+                window.location.href = `/api/admin/siswa/delete/${id}`; 
             }
         })
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.get('status') === 'sukses') {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: 'Data Siswa baru berhasil ditambahkan.',
+            showConfirmButton: false,
+            timer: 2000
+        });
+        window.history.replaceState(null, null, window.location.pathname);
+        
+    } else if (urlParams.get('status') === 'diperbarui') { 
+        Swal.fire({
+            icon: 'success',
+            title: 'Diperbarui!',
+            text: 'Perubahan data siswa berhasil disimpan.',
+            showConfirmButton: false,
+            timer: 2000
+        });
+        window.history.replaceState(null, null, window.location.pathname);
+        
+    } else if (urlParams.get('status') === 'dihapus') { 
+        Swal.fire({
+            icon: 'success',
+            title: 'Terhapus!',
+            text: 'Data Siswa telah dihapus secara permanen.',
+            showConfirmButton: false,
+            timer: 2000
+        });
+        window.history.replaceState(null, null, window.location.pathname);
     }
 </script>
 

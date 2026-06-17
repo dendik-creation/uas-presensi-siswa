@@ -22,8 +22,6 @@ class User {
   |-------------------------------------------------------------------------------
   | Find User By Username
   |-------------------------------------------------------------------------------
-  | Method:         findByUsername
-  | Description:    Finds a user record in database matching username
   */
   static async findByUsername(username) {
     const [rows] = await db.query("SELECT * FROM users WHERE username = ? LIMIT 1", [username]);
@@ -35,8 +33,6 @@ class User {
   |-------------------------------------------------------------------------------
   | Find User By ID
   |-------------------------------------------------------------------------------
-  | Method:         findById
-  | Description:    Finds a user record in database matching user ID
   */
   static async findById(id) {
     const [rows] = await db.query("SELECT * FROM users WHERE id = ? LIMIT 1", [id]);
@@ -48,8 +44,6 @@ class User {
   |-------------------------------------------------------------------------------
   | Verify User Password
   |-------------------------------------------------------------------------------
-  | Method:         verifyPassword
-  | Description:    Verifies plain password against stored hash (MD5 or bcrypt)
   */
   async verifyPassword(plainPassword) {
     const hashed = this.password;
@@ -70,8 +64,6 @@ class User {
   |-------------------------------------------------------------------------------
   | Update Profile Details
   |-------------------------------------------------------------------------------
-  | Method:         updateProfile
-  | Description:    Updates user profile details (nama, no_hp, and optionally password)
   */
   static async updateProfile(id, data) {
     let query = "UPDATE users SET nama = ?, no_hp = ?, updated_at = NOW()";
@@ -94,44 +86,79 @@ class User {
   |-------------------------------------------------------------------------------
   | Get All Siswa
   |-------------------------------------------------------------------------------
-  | Method:         getAllSiswa
-  | Description:    Gets all users with role siswa (LEGACY - EMPTIED)
   */
   static async getAllSiswa() {
-    return [];
+    const [rows] = await db.query(
+      "SELECT id, username, nama AS nama_lengkap, kelas, no_hp FROM users WHERE role = 'siswa' ORDER BY id DESC"
+    );
+    return rows;
+  }
+
+  /*
+  |-------------------------------------------------------------------------------
+  | Get Siswa By ID (Khusus Untuk Halaman Edit)
+  |-------------------------------------------------------------------------------
+  */
+  static async getSiswaById(id) {
+    const [rows] = await db.query(
+      "SELECT id, username, nama AS nama_lengkap, kelas, no_hp FROM users WHERE id = ? AND role = 'siswa' LIMIT 1", 
+      [id]
+    );
+    if (rows.length === 0) return null;
+    return rows[0];
   }
 
   /*
   |-------------------------------------------------------------------------------
   | Create Siswa Record
   |-------------------------------------------------------------------------------
-  | Method:         createSiswa
-  | Description:    Creates new siswa user (LEGACY - EMPTIED)
   */
   static async createSiswa(data) {
-    return null;
+    const query = `
+      INSERT INTO users (username, password, nama, kelas, no_hp, role, is_active, created_at)
+      VALUES (?, ?, ?, ?, ?, 'siswa', 1, NOW())
+    `;
+    const params = [
+      data.username, 
+      data.password, 
+      data.nama_lengkap, 
+      data.kelas, 
+      data.no_hp || null
+    ];
+    
+    const [result] = await db.query(query, params);
+    return result.insertId;
   }
 
   /*
   |-------------------------------------------------------------------------------
   | Update Siswa Record
   |-------------------------------------------------------------------------------
-  | Method:         updateSiswa
-  | Description:    Updates active siswa record (LEGACY - EMPTIED)
   */
   static async updateSiswa(id, data) {
-    return false;
+    let query = "UPDATE users SET username = ?, nama = ?, kelas = ?, no_hp = ?, updated_at = NOW()";
+    const params = [data.username, data.nama_lengkap, data.kelas, data.no_hp || null];
+
+    if (data.password) {
+      query += ", password = ?";
+      params.push(data.password);
+    }
+
+    query += " WHERE id = ? AND role = 'siswa'";
+    params.push(id);
+
+    const [result] = await db.query(query, params);
+    return result.affectedRows > 0;
   }
 
   /*
   |-------------------------------------------------------------------------------
   | Delete Siswa Record
   |-------------------------------------------------------------------------------
-  | Method:         deleteSiswa
-  | Description:    Deletes siswa record from database (LEGACY - EMPTIED)
   */
   static async deleteSiswa(id) {
-    return false;
+    const [result] = await db.query("DELETE FROM users WHERE id = ? AND role = 'siswa'", [id]);
+    return result.affectedRows > 0;
   }
 }
 

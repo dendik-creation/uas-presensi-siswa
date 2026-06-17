@@ -8,7 +8,7 @@
                     <h4 class="mb-0 text-dark">Ubah Data Siswa</h4>
                 </div>
                 <div class="card-body">
-                    <form action="/admin/siswa/update/<%= siswa.id %>" method="POST">
+                    <form action="/api/admin/siswa/update/<%= siswa.id %>" method="POST">
                         <div class="mb-3">
                             <label class="form-label fw-bold">Username / NIS</label>
                             <input type="text" name="username" class="form-control bg-light" value="<%= siswa.username %>" required>
